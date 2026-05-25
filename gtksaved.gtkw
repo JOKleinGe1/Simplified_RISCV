@@ -1,0 +1,54 @@
+[*]
+[*] GTKWave Analyzer v3.3.125 (w)1999-2025 BSI
+[*] Fri May 22 21:53:46 2026
+[*]
+[dumpfile] "/home/jok/RISCV/RISCV_simplied/wave.vcd"
+[dumpfile_mtime] "Fri May 22 21:41:48 2026"
+[dumpfile_size] 17674
+[savefile] "/home/jok/RISCV/RISCV_simplied/gtksaved.gtkw"
+[timestart] 1652000
+[size] 1939 923
+[pos] -1 -1
+*-16.789909 2016200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb_riscv.
+[sst_width] 290
+[signals_width] 340
+[sst_expanded] 1
+[sst_vpaned_height] 264
+@28
+tb_riscv.reset
+tb_riscv.clk
+@22
+tb_riscv.dut.PC[31:0]
+tb_riscv.dut.state[4:0]
+tb_riscv.dut.instruction[31:0]
+tb_riscv.dut.rs1[4:0]
+tb_riscv.dut.rs2[4:0]
+tb_riscv.dut.read_data1[31:0]
+tb_riscv.dut.read_data2[31:0]
+tb_riscv.dut.imm[31:0]
+tb_riscv.dut.alu_in2[31:0]
+tb_riscv.dut.alu_result[31:0]
+@28
+tb_riscv.dut.mem_write
+tb_riscv.dut.mem_to_reg
+@22
+tb_riscv.dut.rd[4:0]
+tb_riscv.dut.\dmem[0][31:0]
+tb_riscv.dut.\dmem[1][31:0]
+tb_riscv.dut.\dmem[2][31:0]
+tb_riscv.dut.\dmem[3][31:0]
+tb_riscv.dut.\dmem[4][31:0]
+tb_riscv.dut.\dmem[5][31:0]
+tb_riscv.dut.\registers[1][31:0]
+@23
+tb_riscv.dut.\registers[2][31:0]
+@22
+tb_riscv.dut.\registers[3][31:0]
+tb_riscv.dut.\registers[0][31:0]
+tb_riscv.dut.\registers[4][31:0]
+tb_riscv.dut.\registers[5][31:0]
+tb_riscv.inport[7:0]
+tb_riscv.outport[7:0]
+[pattern_trace] 1
+[pattern_trace] 0
