@@ -29,26 +29,54 @@ architecture rtl of riscv_simple is
     -- =====================================================
     -- ETATS
     -- =====================================================
-    type state_t is (FETCH, DECODE, EXECUTE, MEM, WB, TRAP);
-    signal state : state_t;
+    constant FETCH : integer := 0;
+    constant DECODE : integer := 1;
+    constant EXECUTE : integer := 2;
+    constant MEM : integer := 3;
+    constant WB : integer := 4;
+    constant TRAP : integer := 5;
+    signal state : integer;
+
+--    type state_t is (FETCH, DECODE, EXECUTE, MEM, WB, TRAP);
+--    signal state : state_t;
 
     -- =====================================================
     -- CPU
     -- =====================================================
     signal PC          : std_logic_vector(31 downto 0);
     signal instruction : std_logic_vector(31 downto 0);
-    signal imem        : imem_t;
+
+signal imem : imem_t := (
+X"00000093",
+X"00500113",
+X"20000193",
+X"00000293",
+X"0011a023",
+X"0001a203",
+X"00108093",
+X"00418193",
+X"004282b3",
+X"00208463",
+X"fe0004e3",
+X"40000193",
+X"0001a203",
+X"00f24093",
+X"0011a223",
+X"fe0008e3",
+others => X"00000000" );
 
     -- =====================================================
     -- BANC DE REGISTRES
     -- =====================================================
-    signal registers : regfile_t;
+    signal registers : regfile_t := (others => X"00000000");
+    signal registers_all : std_logic_vector(1023 downto 0);
 
     -- =====================================================
     -- MEMOIRE DE DONNEES
     -- =====================================================
-    signal dmem      : dmem_t;
+    signal dmem      : dmem_t := (others => X"00000000");
     signal dmem_data : std_logic_vector(31 downto 0);
+    signal dmem_all  : std_logic_vector(8191 downto 0);
 
     -- =====================================================
     -- DECODE
@@ -93,6 +121,15 @@ architecture rtl of riscv_simple is
     signal zero : std_logic;
 
 begin
+    -- pour que tb recupere les registres
+    g1:for i in 0 to 31 generate
+          registers_all(31+(32*i) downto 32*i) <= registers(i);
+    end generate;
+
+    -- pour que le tb recupere dmem
+    g2: for i in 0 to 255 generate
+          dmem_all(31+(32*i) downto 32*i) <= dmem(i);
+    end generate;
 
     -- =====================================================
     -- DECODE (signaux combinatoires issus de l'instruction)
@@ -289,6 +326,8 @@ begin
                     when TRAP =>
                         null;
 
+		    when others =>
+                        null;
                 end case;
             end if;
         end if;

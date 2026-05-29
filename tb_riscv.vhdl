@@ -27,6 +27,14 @@ architecture sim of tb_riscv is
         );
     end component;
 
+    constant FETCH : integer := 0;
+    constant DECODE : integer := 1;
+    constant EXECUTE : integer := 2;
+    constant MEM : integer := 3;
+    constant WB : integer := 4;
+    constant TRAP : integer := 5;
+
+
     -- =====================================================
     -- Signaux de stimulation
     -- =====================================================
@@ -35,9 +43,20 @@ architecture sim of tb_riscv is
     signal inport  : std_logic_vector(7 downto 0) := x"C8";
     signal outport : std_logic_vector(7 downto 0);
     signal pc_dbg  : std_logic_vector(23 downto 0);
-
+  
     -- Période d'horloge : 10 ns  (équivalent #5 / #5)
     constant CLK_PERIOD : time := 10 ns;
+
+    -- pour recuperer les registres du cpu
+    signal i_reg_all : std_logic_vector(1023 downto 0);
+    type regfile_t is array (0 to 31) of std_logic_vector(31 downto 0);
+    signal reg       : regfile_t;
+
+    -- pour recuperer dmem du cpu
+    signal i_dmem_all : std_logic_vector(8191 downto 0);
+    type dmem_t is array (0 to 255) of std_logic_vector(31 downto 0);
+    signal dmem : dmem_t;
+
 
     -- =====================================================
     -- Fonction utilitaire : slv -> hex string (8 chiffres)
@@ -84,8 +103,21 @@ begin
             reset   => reset,
             inport  => inport,
             outport => outport,
-            pc_dbg  => pc_dbg
-        );
+            pc_dbg  => pc_dbg);
+
+        -- recuperation des registres du cpu
+	i_reg_all <= <<signal dut.registers_all : std_logic_vector(1023 downto 0)>>;
+        g1:for i in 0 to 31 generate
+              reg(i) <= i_reg_all(31+(32*i) downto 32*i);
+        end generate;
+
+        -- recuperation de dmem du cpu
+        i_dmem_all <= <<signal dut.dmem_all : std_logic_vector(8191 downto 0)>>;
+        g2: for i in 0 to 255 generate
+               dmem(i) <= i_dmem_all(31+(32*i) downto 32*i);
+        end generate;
+
+
 
     -- =====================================================
     -- Génération horloge (10 ns)
@@ -112,41 +144,34 @@ begin
         -- -----------------------------------------------
         -- Affichage du banc de registres
         -- -----------------------------------------------
-        write(l, string'("==== REGISTERS ===="));
-        writeline(output, l);
+        assert false report "==== REGISTERS ====" severity Note;
 
         for i in 0 to 7 loop
-            write(l, "r" & integer'image(i) & " = 0x" &
-                  to_hex8(<<signal dut.registers(i) : std_logic_vector(31 downto 0)>>));
-            writeline(output, l);
+            assert false report "r" & integer'image(i) & " = 0x" & to_hex8(reg(i)) severity Note;
         end loop;
 
         -- -----------------------------------------------
         -- Affichage de la mémoire de données
         -- -----------------------------------------------
-        write(l, string'("==== MEMORY ===="));
-        writeline(output, l);
+        assert false report "==== MEMORY ====" severity Note;
 
         for i in 128 to 135 loop
-            write(l, "MEM[" & integer'image(i) & "] = 0x" &
-                  to_hex8(<<signal dut.dmem(i) : std_logic_vector(31 downto 0)>>));
-            writeline(output, l);
+            assert false report "MEM[" & integer'image(i) & "] = 0x" & to_hex8(dmem(i)) severity Note;
         end loop;
 
         -- -----------------------------------------------
         -- Vérification automatique
         -- -----------------------------------------------
-        if    <<signal dut.dmem(128) : std_logic_vector(31 downto 0)>> = x"00000000"
-          and <<signal dut.dmem(129) : std_logic_vector(31 downto 0)>> = x"00000001"
-          and <<signal dut.dmem(130) : std_logic_vector(31 downto 0)>> = x"00000002"
-          and <<signal dut.dmem(131) : std_logic_vector(31 downto 0)>> = x"00000003"
-          and <<signal dut.dmem(132) : std_logic_vector(31 downto 0)>> = x"00000004"
+        if    dmem(128) = x"00000000"
+          and dmem(129) = x"00000001"
+          and dmem(130) = x"00000002"
+          and dmem(131) = x"00000003"
+          and dmem(132) = x"00000004"
         then
-            write(l, string'("✅ TEST PASSED"));
+            assert false report "TEST PASSED" severity Note;
         else
-            write(l, string'("❌ TEST FAILED"));
+            assert false report "TEST FAILED" severity Note;
         end if;
-        writeline(output, l);
 
         -- Fin de simulation
         std.env.finish;
@@ -159,8 +184,10 @@ begin
     -- =====================================================
     trace_proc : process(clk)
         variable l      : line;
-        -- Accès aux signaux internes du DUT via VHDL-2008 external names
-        alias dut_state      is <<signal dut.state      : riscv_simple.rtl.state_t>>;
+        -- Accès aux signaux internes du DUT via VHDL-2008 external name
+--    type state_t is (FETCH, DECODE, EXECUTE, MEM, WB, TRAP);
+
+        alias dut_state      is <<signal dut.state : integer>>;
         alias dut_opcode     is <<signal dut.opcode     : std_logic_vector(6 downto 0)>>;
         alias dut_alu_ctrl   is <<signal dut.alu_ctrl   : std_logic_vector(3 downto 0)>>;
         alias dut_PC         is <<signal dut.PC         : std_logic_vector(31 downto 0)>>;
@@ -174,10 +201,11 @@ begin
         alias dut_read_data2 is <<signal dut.read_data2 : std_logic_vector(31 downto 0)>>;
 
         -- Lecture du banc de registres DUT
-        impure function reg(idx : std_logic_vector(4 downto 0)) return std_logic_vector is
-        begin
-            return <<signal dut.registers(to_integer(unsigned(idx))) : std_logic_vector(31 downto 0)>>;
-        end function;
+--        impure function reg(idx : std_logic_vector(4 downto 0)) return std_logic_vector is
+--        begin
+--            return <<signal dut.registers : dut.rtl.regfile_t>>;
+--            return <<signal dut.registers : std_logic_vector(1023 downto 0)>>;
+--        end function;
 
         -- PC + imm (pour affichage branchement)
         impure function pc_plus_imm return std_logic_vector is
@@ -189,8 +217,7 @@ begin
         if rising_edge(clk) then
 
             if reset = '0' then
-                write(l, string'("RESET"));
-                writeline(output, l);
+                assert false report "RESET" severity Note;
 
             elsif dut_state = WB then
 
@@ -202,37 +229,36 @@ begin
                     when "0110011" =>
                         case dut_alu_ctrl is
                             when "0000" =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (R) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
-                                      " + r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(dut_rs2)) & ")" &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
+                                      " + r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs2)))) & ")" &
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                             when "0001" =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (R) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
-                                      " & r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(dut_rs2)) & ")" &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
+                                      " & r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs2)))) & ")" &
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                             when "0010" =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (R) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
-                                      " | r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(dut_rs2)) & ")" &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
+                                      " | r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs2)))) & ")" &
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                             when "0011" =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (R) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
-                                      " ^ r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(dut_rs2)) & ")" &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
+                                      " ^ r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs2)))) & ")" &
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                             when others =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (R) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
-                                      " ?? r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(dut_rs2)) & ")" &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
+                                      " ?? r" & to_reg(dut_rs2) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs2)))) & ")" &
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                         end case;
-                        writeline(output, l);
 
                     -- -----------------------------------
                     -- I-TYPE
@@ -240,71 +266,67 @@ begin
                     when "0010011" =>
                         case dut_alu_ctrl is
                             when "0000" =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (I) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
                                       " + 0x" & to_hex8(dut_imm) &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                             when "0001" =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (I) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
                                       " & 0x" & to_hex8(dut_imm) &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                             when "0010" =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (I) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
                                       " | 0x" & to_hex8(dut_imm) &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                             when "0011" =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (I) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
                                       " ^ 0x" & to_hex8(dut_imm) &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                             when others =>
-                                write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                                assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                                       " (I) r" & to_reg(dut_rd) &
-                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
+                                      " = r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
                                       " ?? 0x" & to_hex8(dut_imm) &
-                                      " = 0x" & to_hex8(dut_alu_result));
+                                      " = 0x" & to_hex8(dut_alu_result) severity Note;
                         end case;
-                        writeline(output, l);
 
                     -- -----------------------------------
                     -- LOAD
                     -- -----------------------------------
                     when "0000011" =>
-                        write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                        assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                               " (L) r" & to_reg(dut_rd) &
-                              " = mem[r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
+                              " = mem[r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
                               "+0x" & to_hex8(dut_imm) & "]" &
-                              " = 0x" & to_hex8(dut_dmem_data));
+                              " = 0x" & to_hex8(dut_dmem_data) severity Note;
                         writeline(output, l);
 
                     -- -----------------------------------
                     -- STORE
                     -- -----------------------------------
                     when "0100011" =>
-                        write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
-                              " (S) mem[r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(dut_rs1)) & ")" &
+                        assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                              " (S) mem[r" & to_reg(dut_rs1) & "(0x" & to_hex8(reg(to_integer(unsigned(dut_rs1)))) & ")" &
                               "+0x" & to_hex8(dut_imm) & "]" &
-                              " = r" & to_reg(dut_rs2) & "(0x" & to_hex8(dut_read_data2) & ")");
-                        writeline(output, l);
+                              " = r" & to_reg(dut_rs2) & "(0x" & to_hex8(dut_read_data2) & ")" severity Note;
 
                     -- -----------------------------------
                     -- BRANCH
                     -- -----------------------------------
                     when "1100011" =>
-                        write(l, "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
+                        assert false report "0x" & to_hex8(dut_PC) & ":0x" & to_hex8(dut_instruction) &
                               " (B) PC = PC + (0x" & to_hex8(dut_imm) & ")" &
-                              " = 0x" & to_hex8(pc_plus_imm));
-                        writeline(output, l);
+                              " = 0x" & to_hex8(pc_plus_imm) severity Note;
 
                     when others =>
-                        write(l, string'("	UNKNOW !"));
-                        writeline(output, l);
+                        assert false report "UNKNOW !" severity Note;
 
                 end case;
             end if;
