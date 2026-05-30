@@ -20,8 +20,9 @@ Déassemblage de la section .text :
   28:	fe0004e3          	beqz	zero,10 <loop>
 
 0000002c <end>:
-  2c:	40000193          	li	gp,1024
-  30:	0001a203          	lw	tp,0(gp)
-  34:	00f24093          	xori	ra,tp,15
-  38:	0011a223          	sw	ra,4(gp)
-  3c:	fe0008e3          	beqz	zero,2c <end>
+  2c:	402082b3          	sub	t0,ra,sp
+  30:	40000193          	li	gp,1024
+  34:	0001a203          	lw	tp,0(gp)
+  38:	00f24093          	xori	ra,tp,15
+  3c:	0011a223          	sw	ra,4(gp)
+  40:	fe0006e3          	beqz	zero,2c <end>

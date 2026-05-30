@@ -14,6 +14,7 @@ loop:
    beq x1, x2, end
    beq x0, x0, loop
  end:
+   sub x5, x1, x2
    addi x3, x0, 1024 
    lw x4, 0(x3)
    xori x1, x4, 15

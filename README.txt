@@ -16,3 +16,8 @@ inversion du reset (actif low)
 ajout d'un diviseur d'horloge 2²20 et d'un affichage du PC
 test en sythese : ok. 
 Reste à convertir en VHDL 
+ajout des version VHDL : V1 (pour ghdl) et V2 (pour modelsim)
+simulation et synthese ok. La version ghdl ne montre pas les transferts reg-mem
+du fait de l'impossibilité de descendre dans les signaux d'une instance
+ajout d'une soustraction (uniquement type R) et de son test (source asm). 
+test SUB (r) dans verilog + tb : ok

@@ -2,7 +2,7 @@
 Sections d'entrée éliminées
 
  .riscv.attributes
-                0x00000000       0x1a /tmp/ccTHfAi8.o
+                0x00000000       0x1a /tmp/cccIE2wI.o
 
 Configuration mémoire
 
@@ -12,36 +12,36 @@ ram              0x00000000         0x00000100         xrw
 
 Script de l'éditeurs de liens and table de projection mémoire
 
-LOAD /tmp/ccTHfAi8.o
+LOAD /tmp/cccIE2wI.o
 LOAD /usr/lib/gcc/riscv32-linux-gnu/15/lib32/ilp32/libgcc.a
                 0x000000fc                        stack = 0xfc
 
-.text           0x00000000       0x40
+.text           0x00000000       0x44
  *(.text._start)
  *(.text)
- .text          0x00000000       0x40 /tmp/ccTHfAi8.o
+ .text          0x00000000       0x44 /tmp/cccIE2wI.o
                 0x00000000                _start
  *(.text.*)
-                0x00000040                        _etext = .
+                0x00000044                        _etext = .
 
-.rodata         0x00000040        0x0
-                0x00000040                        _srodata = .
+.rodata         0x00000044        0x0
+                0x00000044                        _srodata = .
  *(.rodata)
  *(.rodata.*)
-                0x00000040                        _erodata = .
+                0x00000044                        _erodata = .
 
-.data           0x00000040        0x0
-                0x00000040                        _sdata = .
+.data           0x00000044        0x0
+                0x00000044                        _sdata = .
  *(.data)
- .data          0x00000040        0x0 /tmp/ccTHfAi8.o
+ .data          0x00000044        0x0 /tmp/cccIE2wI.o
  *(.data*)
-                0x00000040                        _edata = .
+                0x00000044                        _edata = .
 
-.bss            0x00000040        0x0
-                0x00000040                        _sbss = .
+.bss            0x00000044        0x0
+                0x00000044                        _sbss = .
  *(.bss)
- .bss           0x00000040        0x0 /tmp/ccTHfAi8.o
-                0x00000040                        _ebss = .
+ .bss           0x00000044        0x0 /tmp/cccIE2wI.o
+                0x00000044                        _ebss = .
 
 /DISCARD/
  *(.eh_frame)

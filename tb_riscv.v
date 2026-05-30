@@ -96,9 +96,12 @@ always @(posedge clk)
     	case(dut.opcode)       		
         	7'b0110011: 
          	case(dut.alu_ctrl)       		
+        		4'b0100: $display ("0x%08x:0x%08x (R) r%0d = r%0d(0x%08x) - r%0d(0x%08x) = 0x%08x",
+        			dut.PC,dut.instruction, dut.rd, dut.rs1,dut.registers[dut.rs1],
+        			dut.rs2,dut.registers[dut.rs2] ,dut.alu_result ); 
         		4'b0000: $display ("0x%08x:0x%08x (R) r%0d = r%0d(0x%08x) + r%0d(0x%08x) = 0x%08x",
-        		dut.PC,dut.instruction, dut.rd, dut.rs1,dut.registers[dut.rs1],
-        		dut.rs2,dut.registers[dut.rs2] ,dut.alu_result ); 
+        			dut.PC,dut.instruction, dut.rd, dut.rs1,dut.registers[dut.rs1],
+        			dut.rs2,dut.registers[dut.rs2] ,dut.alu_result ); 
        	 		4'b0001: $display ("0x%08x:0x%08x (R) r%0d = r%0d(0x%08x) & r%0d(0x%08x) = 0x%08x",
         		dut.PC,dut.instruction, dut.rd,  dut.rs1,dut.registers[dut.rs1],
         		dut.rs2,dut.registers[dut.rs2] ,dut.alu_result ); 
