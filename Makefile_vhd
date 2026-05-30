@@ -1,0 +1,26 @@
+GHDL=ghdl
+GHDLFLAGS=--std=08
+
+SRC=riscv_simple.vhd
+TB=tb_riscv.vhd
+
+TOP=tb_riscv
+BINVHD = imem_init.vhdl
+
+all: run
+
+analyze:
+	$(GHDL) -a $(GHDLFLAGS) $(SRC)
+	$(GHDL) -a $(GHDLFLAGS) $(TB)
+
+elaborate: analyze
+	$(GHDL) -e $(GHDLFLAGS) $(TOP)
+
+run: elaborate
+	$(GHDL) -r $(GHDLFLAGS) $(TOP) --vcd=wave.vcd
+
+wave:
+	gtkwave wave.vcd & 
+
+clean:
+	rm -f *.cf wave.vcd $(TOP)

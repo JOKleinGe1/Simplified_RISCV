@@ -1,0 +1,3 @@
+rm riscv_simple.vhd tb_riscv.vhd
+ln -s riscv_simple_v1.vhd riscv_simple.vhd
+ln -s tb_riscv_v1.vhd tb_riscv.vhd

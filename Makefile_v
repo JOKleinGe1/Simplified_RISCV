@@ -1,0 +1,23 @@
+# Nom du design
+TOP = riscv_simple
+TB  = tb_riscv
+
+# Fichiers
+SRC_V = riscv_simple.v tb_riscv.v
+
+# Sortie
+OUT = sim.out
+
+all: run
+
+compile:
+	iverilog -o $(OUT) $(SRC_V)
+
+run: compile
+	vvp $(OUT)
+
+wave:
+	gtkwave wave.vcd &
+
+clean:
+	rm -f *.out *.vcd
