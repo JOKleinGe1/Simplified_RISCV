@@ -1,6 +1,10 @@
 -- =====================================================
--- tb_riscv.vhd
--- Traduction VHDL du testbench RISC-V simplifié
+-- riscv_simple.vhd
+-- Simplified RISC-V  (some RV32I instructions are missing) 
+-- Revision 2026-06-03 (jok & PhC) - IUT de CACHAN Dept GEii-1 - Univ Paris Saclay
+-- Please see assembly source in src directory, run make 
+-- and update the  binary code instruction (line 55-70) with content of src/imem_initial.vhd 
+-- Last update : add the previous comments
 -- =====================================================
 
 library ieee;
