@@ -208,35 +208,6 @@ https://fpgasoftware.intel.com/eula.
 	(annotation_block (location)(rect 1048 472 1104 488))
 )
 (symbol
-	(rect 208 104 360 184)
-	(text "clock_div_2pow20" (rect 5 0 101 12)(font "Arial" ))
-	(text "inst1" (rect 8 64 32 76)(font "Intel Clear" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "clk" (rect 0 0 16 12)(font "Arial" ))
-		(text "clk" (rect 21 27 37 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32))
-	)
-	(port
-		(pt 0 48)
-		(input)
-		(text "enable" (rect 0 0 36 12)(font "Arial" ))
-		(text "enable" (rect 21 43 57 55)(font "Arial" ))
-		(line (pt 0 48)(pt 16 48))
-	)
-	(port
-		(pt 152 32)
-		(output)
-		(text "clk_div" (rect 0 0 37 12)(font "Arial" ))
-		(text "clk_div" (rect 100 27 137 39)(font "Arial" ))
-		(line (pt 152 32)(pt 136 32))
-	)
-	(drawing
-		(rectangle (rect 16 16 136 64))
-	)
-)
-(symbol
 	(rect 208 264 384 344)
 	(text "BCDto7seg" (rect 5 0 65 12)(font "Arial" ))
 	(text "inst4" (rect 8 64 32 76)(font "Intel Clear" ))
@@ -409,6 +380,35 @@ https://fpgasoftware.intel.com/eula.
 	)
 	(drawing
 		(rectangle (rect 16 16 184 96))
+	)
+)
+(symbol
+	(rect 208 104 360 184)
+	(text "clock_div" (rect 5 0 55 12)(font "Arial" ))
+	(text "inst1" (rect 8 64 32 76)(font "Intel Clear" ))
+	(port
+		(pt 0 32)
+		(input)
+		(text "clk" (rect 0 0 16 12)(font "Arial" ))
+		(text "clk" (rect 21 27 37 39)(font "Arial" ))
+		(line (pt 0 32)(pt 16 32))
+	)
+	(port
+		(pt 0 48)
+		(input)
+		(text "enable" (rect 0 0 36 12)(font "Arial" ))
+		(text "enable" (rect 21 43 57 55)(font "Arial" ))
+		(line (pt 0 48)(pt 16 48))
+	)
+	(port
+		(pt 152 32)
+		(output)
+		(text "clk_div" (rect 0 0 37 12)(font "Arial" ))
+		(text "clk_div" (rect 100 27 137 39)(font "Arial" ))
+		(line (pt 152 32)(pt 136 32))
+	)
+	(drawing
+		(rectangle (rect 16 16 136 64))
 	)
 )
 (connector
