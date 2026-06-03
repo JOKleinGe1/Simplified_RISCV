@@ -1,11 +1,7 @@
--- =============================================================================
+-- =====================================================
 -- tb_riscv.vhd
--- Test bench for simplified RISC-V  (some RV32I instructions are missing) 
--- Revision 2026-06-03 (jok & PhC) - IUT de CACHAN Dept GEii-1 - Univ Paris Saclay
--- Please set DEBUG_MODELSIM generic to TRUE for Modelsim simulation
--- or FALSE for GHDL simulation (line 18)
--- Last update : add generics+generate (DEBUG_MODELSIM) conditional compilation
--- =============================================================================
+-- Traduction VHDL du testbench RISC-V simplifié
+-- =====================================================
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -15,7 +11,8 @@ use ieee.std_logic_textio.all;
 
 entity tb_riscv is
     generic (
-        DEBUG_MODELSIM : boolean := false  -- Please set DEBUG_MODELSIM to FALSE for GHDL simulation or TRUE for ModelSim
+        DEBUG_MODELSIM : boolean := true  
+        -- Please set DEBUG_MODELSIM to FALSE for GHDL simulation or TRUE for ModelSim
     );
 
 end entity tb_riscv;
@@ -42,6 +39,7 @@ architecture sim of tb_riscv is
     constant WB : integer := 4;
     constant TRAP : integer := 5;
 
+
     -- =====================================================
     -- Signaux de stimulation
     -- =====================================================
@@ -63,6 +61,7 @@ architecture sim of tb_riscv is
     signal i_dmem_all : std_logic_vector(8191 downto 0);
     type dmem_t is array (0 to 255) of std_logic_vector(31 downto 0);
     signal dmem : dmem_t;
+
 
     -- =====================================================
     -- Fonction utilitaire : slv -> hex string (8 chiffres)
@@ -110,8 +109,8 @@ begin
             inport  => inport,
             outport => outport,
             pc_dbg  => pc_dbg);
-	
-	gen_mem_reg : if DEBUG_MODELSIM generate
+
+	--gen_mem_reg : if DEBUG_MODELSIM generate
         -- recuperation des registres du cpu
 	i_reg_all <= <<signal dut.registers_all : std_logic_vector(1023 downto 0)>>;
         g1:for i in 0 to 31 generate
@@ -123,7 +122,7 @@ begin
         g2: for i in 0 to 255 generate
                dmem(i) <= i_dmem_all(31+(32*i) downto 32*i);
         end generate;
-	end generate;
+	 -- end generate;-- end if DEBUG_MODELSIM
 
     -- =====================================================
     -- Génération horloge (10 ns)
@@ -146,50 +145,50 @@ begin
         wait for 2500 ns;
         inport <= x"A3";
         wait for 500 ns;
-	if DEBUG_MODELSIM then 
-		-- -----------------------------------------------
-		-- Affichage du banc de registres
-		-- -----------------------------------------------
-		assert false report "==== REGISTERS ====" severity Note;
 
-		for i in 0 to 7 loop
-		    assert false report "r" & integer'image(i) & " = 0x" & to_hex8(reg(i)) severity Note;
-		end loop;
+  	-- if DEBUG_MODELSIM then 
+        -- -----------------------------------------------
+        -- Affichage du banc de registres
+        -- -----------------------------------------------
+        assert false report "==== REGISTERS ====" severity Note;
 
-		-- -----------------------------------------------
-		-- Affichage de la mémoire de données
-		-- -----------------------------------------------
-		assert false report "==== MEMORY ====" severity Note;
+        for i in 0 to 7 loop
+            assert false report "r" & integer'image(i) & " = 0x" & to_hex8(reg(i)) severity Note;
+        end loop;
 
-		for i in 128 to 135 loop
-		    assert false report "MEM[" & integer'image(i) & "] = 0x" & to_hex8(dmem(i)) severity Note;
-		end loop;
+        -- -----------------------------------------------
+        -- Affichage de la mémoire de données
+        -- -----------------------------------------------
+        assert false report "==== MEMORY ====" severity Note;
 
-		-- -----------------------------------------------
-		-- Vérification automatique
-		-- -----------------------------------------------
-		if    dmem(128) = x"00000000"
-		  and dmem(129) = x"00000001"
-		  and dmem(130) = x"00000002"
-		  and dmem(131) = x"00000003"
-		  and dmem(132) = x"00000004"
-		then
-		    assert false report "TEST PASSED" severity Note;
-		else
-		    assert false report "TEST FAILED" severity Note;
-		end if;
-		assert FALSE report "End of simulation" severity failure;
-        else --DEBUG_MODELSIM
-       		std.env.finish;
-        	wait;
+        for i in 128 to 135 loop
+            assert false report "MEM[" & integer'image(i) & "] = 0x" & to_hex8(dmem(i)) severity Note;
+        end loop;
+
+        -- -----------------------------------------------
+        -- Vérification automatique
+        -- -----------------------------------------------
+        if    dmem(128) = x"00000000"
+          and dmem(129) = x"00000001"
+          and dmem(130) = x"00000002"
+          and dmem(131) = x"00000003"
+          and dmem(132) = x"00000004"
+        then
+            assert false report "TEST PASSED" severity Note;
+        else
+            assert false report "TEST FAILED" severity Note;
         end if;
+		-- end if ; -- DEBUG_MODELSIM
+        -- Fin de simulation
+        std.env.finish;
+        wait;
     end process;
-   
+
     -- =====================================================
     -- Processus de trace (équivalent always @posedge clk)
     -- Affiche l'instruction en cours à l'état WB
     -- =====================================================
-	gen_trace : if DEBUG_MODELSIM generate
+	-- gen_trace : if DEBUG_MODELSIM generate
 	    	trace_proc : process(clk)
 		variable l      : line;
 		-- Accès aux signaux internes du DUT via VHDL-2008 external name
@@ -328,6 +327,6 @@ begin
 		    end if;
 		end if;
 	    end process;
-    end generate;
+    -- end generate;
 
 end architecture sim;
