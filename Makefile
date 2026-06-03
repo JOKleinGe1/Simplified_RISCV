@@ -1,23 +1,27 @@
-# Nom du design
-TOP = riscv_simple
-TB  = tb_riscv
+GHDL=ghdl
+GHDLFLAGS=--std=08
 
-# Fichiers
-SRC = riscv_simple.v tb_riscv.v
+SRC=riscv_simple.vhd
+TB=tb_riscv.vhd
 
-# Sortie
-OUT = sim.out
+TOP=tb_riscv
+BINVHD = imem_init.vhdl
 
 all: run
 
-compile:
-	iverilog -o $(OUT) $(SRC)
+analyze:
+	$(GHDL) -a $(GHDLFLAGS) $(SRC)
+	$(GHDL) -a $(GHDLFLAGS) $(TB)
 
-run: compile
-	vvp $(OUT)
+elaborate: analyze
+	$(GHDL) -e $(GHDLFLAGS) $(TOP)
+
+run: elaborate
+	$(GHDL) -r $(GHDLFLAGS) $(TOP) --vcd=wave.vcd
 
 wave:
-	gtkwave wave.vcd &
+	gtkwave wave.vcd & 
 
 clean:
-	rm -f *.out *.vcd
+	rm -f *.cf wave.vcd $(TOP) *.o *.bak
+	rm -rf db/ incremental_db/ output_files/ simulation/
