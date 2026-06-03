@@ -13,6 +13,7 @@ use ieee.numeric_std.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
 
+entity tb_riscv is
 end entity tb_riscv;
 
 architecture sim of tb_riscv is
