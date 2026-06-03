@@ -13,12 +13,6 @@ use ieee.numeric_std.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
 
-entity tb_riscv is
-    generic (
-        DEBUG_MODELSIM : boolean := true  
-        -- Please set DEBUG_MODELSIM to FALSE for GHDL simulation or TRUE for ModelSim
-    );
-
 end entity tb_riscv;
 
 architecture sim of tb_riscv is
@@ -114,7 +108,6 @@ begin
             outport => outport,
             pc_dbg  => pc_dbg);
 
-	--gen_mem_reg : if DEBUG_MODELSIM generate
         -- recuperation des registres du cpu
 	i_reg_all <= <<signal dut.registers_all : std_logic_vector(1023 downto 0)>>;
         g1:for i in 0 to 31 generate
@@ -126,7 +119,6 @@ begin
         g2: for i in 0 to 255 generate
                dmem(i) <= i_dmem_all(31+(32*i) downto 32*i);
         end generate;
-	 -- end generate;-- end if DEBUG_MODELSIM
 
     -- =====================================================
     -- Génération horloge (10 ns)
@@ -150,7 +142,6 @@ begin
         inport <= x"A3";
         wait for 500 ns;
 
-  	-- if DEBUG_MODELSIM then 
         -- -----------------------------------------------
         -- Affichage du banc de registres
         -- -----------------------------------------------
@@ -182,7 +173,6 @@ begin
         else
             assert false report "TEST FAILED" severity Note;
         end if;
-		-- end if ; -- DEBUG_MODELSIM
         -- Fin de simulation
         std.env.finish;
         wait;
@@ -192,7 +182,6 @@ begin
     -- Processus de trace (équivalent always @posedge clk)
     -- Affiche l'instruction en cours à l'état WB
     -- =====================================================
-	-- gen_trace : if DEBUG_MODELSIM generate
 	    	trace_proc : process(clk)
 		variable l      : line;
 		-- Accès aux signaux internes du DUT via VHDL-2008 external name
@@ -331,6 +320,5 @@ begin
 		    end if;
 		end if;
 	    end process;
-    -- end generate;
 
 end architecture sim;
