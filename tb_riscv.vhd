@@ -3,6 +3,7 @@
 -- Simplified RISC-V  (some RV32I instructions are missing) 
 -- Revision 2026-06-03 (jok & PhC) - IUT de CACHAN Dept GEii-1 - Univ Paris Saclay
 -- Use this version for MODELSIM simulation 
+-- Use tb_riscv_Ghdl.vhd for GHDL simulation 
 -- Last update : add the previous comments
 -- =====================================================
 
