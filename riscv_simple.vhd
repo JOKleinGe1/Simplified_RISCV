@@ -4,7 +4,6 @@
 -- Revision 2026-06-03 (jok & PhC) - IUT de CACHAN Dept GEii-1 - Univ Paris Saclay
 -- Please see assembly source in src directory, run make 
 -- and update the  binary code instruction (line 55-70) with content of src/imem_initial.vhd 
--- Last update : add the previous comments
 -- =====================================================
 
 library ieee;
