@@ -333,13 +333,4 @@ begin
         end if;
     end process;
 
-    -- =====================================================
-    -- INITIALISATION (simulation uniquement)
-    -- =====================================================
-    -- Note : l'initialisation du banc de registres à zéro
-    -- et le chargement de imem via $readmemh n'ont pas
-    -- d'équivalent synthétisable en VHDL standard.
-    -- Pour la simulation, utiliser un process d'initialisation
-    -- ou un testbench dédié avec std.textio.
-
 end architecture rtl;
