@@ -1,6 +1,6 @@
 ****************************************************************************
  ✅️ Si vous êtes étudiant·es de l'IUT de CACHAN, en GEii- parcours S3-ESE, 
-vous êtes au bon endroit. 👌  
+vous êtes au bon endroit. 👌 
 ****************************************************************************
 
 Description d'un processeur RISCV simplifié. 
