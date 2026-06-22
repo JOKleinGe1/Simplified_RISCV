@@ -1,5 +1,5 @@
 ****************************************************************************
- ✅️ Si vous êtes étudiant·es de l'IUT de CACHAN, en GEii- 1, parcours S3-ESE, 
+ ✅️ Si vous êtes étudiant·es de l'IUT de CACHAN, en GEii-1, parcours S3-ESE, 
 vous êtes au bon endroit. 👌 
 ****************************************************************************
 
