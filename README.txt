@@ -1,3 +1,10 @@
+Dépot initial. 
+************************************************************************************
+/!\ Si vous êtes étudiants en S3 n'utilisez pas cette branche "initial". 
+    choisissez la branche "VHDL". 
+************************************************************************************
+
+Historique des points résolus : 
 creation du fichier .qip avec l'interface de quartus
 remplacement du tableau par l'instant irom_inst 
 Error (12006): Node instance "irom_inst" instantiates undefined entity "irom". Ensure that required library paths are specified correctly, define the specified entity, or change the instantiation. If this entity represents Intel FPGA or third-party IP, generate the synthesis files for the IP.
