@@ -1,7 +1,7 @@
-Dépot initial. 
+⚠️ ❌️ Dépot initial (verilog). ❌️ ⚠️
 ************************************************************************************
-/!\ Si vous êtes étudiants en S3 n'utilisez pas cette branche "initial". 
-    choisissez la branche "VHDL". 
+⚠️ Si vous êtes étudiants de l'IUT de CACHAN en S3 parcours ESE
+n'utilisez pas cette branche "initial". ▶️ Choisissez la branche "VHDL".  
 ************************************************************************************
 
 Historique des points résolus : 
